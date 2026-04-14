@@ -34,9 +34,66 @@ def crear_kb() -> KnowledgeBase:
     pablo          = Term("pablo")
     bernardo       = Term("bernardo")
     frasco_arsenico = Term("frasco_arsenico")
+    arsenico      = Term("arsenico")
+    victima        = Term("victima")
 
     # === YOUR CODE HERE ===
-
+    kb.add_fact((Predicate("encontrado_muerto_con", (victima, arsenico))))
+    kb.add_fact((Predicate("arma_crimen", (frasco_arsenico,))))
+    kb.add_fact((Predicate("tiene_huellas", (reynaldo, frasco_arsenico))))
+    kb.add_fact((Predicate("estuvo_podando", (pablo,))))
+    kb.add_fact((Predicate("estuvo_en_el_garaje", (bernardo,))))
+    kb.add_fact((Predicate("acusa_directamente", (pablo, reynaldo))))
+    kb.add_fact((Predicate("estuvo_en_la_cocina", (margot,reynaldo))))
+    kb.add_fact((Predicate("estuvo_en_la_cocina", (reynaldo,margot))))
+    kb.add_fact((Predicate("no_tiene_coartada", (reynaldo,))))
+    
+    kb.add_rule(Rule(
+        head=Predicate("estuvo_lejos_escena", (Term("$X"),)),
+        body=(Predicate("estuvo_podando", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("estuvo_lejos_escena", (Term("$X"),)),
+        body=(Predicate("estuvo_en_el_garaje", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("da_coartada", (Term("$X"), Term("$Y"))),
+        body=(Predicate("estuvo_en_la_cocina", (Term("$X"), Term("$Y"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("evidencia_directa", (Term("$X"),)),
+        body=(Predicate("tiene_huellas", (Term("$X"), Term("$A"))),
+              Predicate("arma_crimen", (Term("$A"),))),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("descartado", (Term("$X"),)),
+        body=(Predicate("estuvo_lejos_escena", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("testimonio_confiable", (Term("$X"), Term("$Y"))),
+        body=(Predicate("descartado", (Term("$X"),)),
+              Predicate("acusa_directamente", (Term("$X"), Term("$Y"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (Term("$X"),)),
+        body=(Predicate("evidencia_directa", (Term("$X"),)),
+              Predicate("no_tiene_coartada", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("encubriendo", (Term("$X"), Term("$Y"))),
+        body=(Predicate("da_coartada", (Term("$X"), Term("$Y"))),
+              Predicate("culpable", (Term("$Y"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("encubridor", (Term("$X"),)),
+        body=(Predicate("da_coartada", (Term("$X"), Term("$Y"))),
+              Predicate("culpable", (Term("$Y"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("coartada_cruzada", (Term("$X"), Term("$Y"))),
+        body=(Predicate("da_coartada", (Term("$X"), Term("$Y"))),
+              Predicate("da_coartada", (Term("$Y"), Term("$X"))),),
+    ))
     # === END YOUR CODE ===
 
     return kb

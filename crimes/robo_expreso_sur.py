@@ -34,9 +34,65 @@ def crear_kb() -> KnowledgeBase:
     marquesa       = Term("marquesa")
     estuche_joyas  = Term("estuche_joyas")
     vagon_equipaje = Term("vagon_equipaje")
+    vagon_privado  = Term("vagon_privado")
+    collar_esmeraldas = Term("collar_esmeraldas")
 
     # === YOUR CODE HERE ===
-
+    kb.add_fact((Predicate("desaparecido", (collar_esmeraldas,))))
+    kb.add_fact((Predicate("vista_en_vagon_privado", (elena,))))
+    kb.add_fact((Predicate("tiene_huellas", (elena, estuche_joyas))))
+    kb.add_fact((Predicate("grabado_camara", (don_rodrigo, vagon_equipaje))))
+    kb.add_fact((Predicate("extremos_opuestos", (vagon_equipaje, vagon_privado))))
+    kb.add_fact((Predicate("victima", (marquesa,))))
+    kb.add_fact((Predicate("acusacion", (marquesa, elena))))
+    kb.add_fact((Predicate("estuvo_en_vagon_comedor", (victor, elena))))
+    kb.add_fact((Predicate("estuvo_en_vagon_comedor", (elena, victor))))
+    
+    kb.add_rule(Rule(
+        head=Predicate("lugar_alejado", (Term("$A"), Term("$B"))),
+        body=(Predicate("extremos_opuestos", (Term("$A"), Term("$B"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("lugar_alejado", (Term("$A"), Term("$B"))),
+        body=(Predicate("extremos_opuestos", (Term("$B"), Term("$A"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("estaba_en_escena", (Term("$X"),)),
+        body=(Predicate("vista_en_vagon_privado", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("coartada", (Term("$X"), Term("$Y"))),
+        body=(Predicate("estuvo_en_vagon_comedor", (Term("$X"), Term("$Y"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("descartado", (Term("$X"),)),
+        body=(Predicate("grabado_camara", (Term("$X"), Term("$Y"))),
+              Predicate("lugar_alejado", (Term("$Y"), vagon_privado)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("testigo_imparcial", (Term("$X"),)),
+        body=(Predicate("victima", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("acusacion_creible", (Term("$X"), Term("$Y"))),
+        body=(Predicate("testigo_imparcial", (Term("$X"),)),
+              Predicate("acusacion", (Term("$X"), Term("$Y"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (Term("$X"),)),
+        body=(Predicate("estaba_en_escena", (Term("$X"),)),
+              Predicate("acusacion_creible", (marquesa, Term("$X"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("defiende_al_culpable", (Term("$X"),)),
+        body=(Predicate("coartada", (Term("$X"), Term("$Y"))),
+              Predicate("culpable", (Term("$Y"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("alianza_coartadas", (Term("$X"), Term("$Y"))),
+        body=(Predicate("coartada", (Term("$X"), Term("$Y"))),
+              Predicate("coartada", (Term("$Y"), Term("$X"))),),
+    ))
     # === END YOUR CODE ===
 
     return kb
