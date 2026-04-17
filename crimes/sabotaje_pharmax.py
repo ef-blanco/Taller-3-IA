@@ -41,7 +41,44 @@ def crear_kb() -> KnowledgeBase:
     sala_cultivos  = Term("sala_cultivos")
 
     # === YOUR CODE HERE ===
-
+    kb.add_fact(Predicate("documentacion_oficial", (dra_santos,)))
+    kb.add_fact(Predicate("registro_conferencia", (director_vega,)))
+    kb.add_fact(Predicate("despedido", (tec_rios,)))
+    kb.add_fact(Predicate("sin_coartada", (tec_rios,)))
+    kb.add_fact(Predicate("sin_coartada", (asistente_mora,)))
+    kb.add_fact(Predicate("acceso", (tec_rios, sala_cultivos)))
+    kb.add_fact(Predicate("acceso", (asistente_mora, sala_cultivos)))
+    kb.add_fact(Predicate("recibio_pagos", (tec_rios, syntek_corp)))
+    kb.add_fact(Predicate("empresa_rival", (syntek_corp,)))
+    kb.add_fact(Predicate("acusacion", (asistente_mora, tec_rios)))
+    kb.add_fact(Predicate("declaracion", (tec_rios, asistente_mora)))
+    kb.add_rule(Rule(
+        head=Predicate("descartado", (Term("$X"),)),
+        body=(Predicate("documentacion_oficial", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("descartado", (Term("$X"),)),
+        body=(Predicate("registro_conferencia", (Term("$X"),)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("conflicto_intereses", (Term("$X"), Term("$Y"))),
+        body=(Predicate("recibio_pagos", (Term("$X"), Term("$Y"))),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("motivo_economico", (Term("$X"),)),
+        body=(Predicate("conflicto_intereses", (Term("$X"), syntek_corp)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("culpable", (Term("$X"),)),
+        body=(Predicate("sin_coartada", (Term("$X"),)),
+              Predicate("motivo_economico", (Term("$X"),)),
+              Predicate("acceso", (Term("$X"), sala_cultivos)),),
+    ))
+    kb.add_rule(Rule(
+        head=Predicate("denuncia_informada", (Term("$X"), Term("$Y"))),
+        body=(Predicate("acceso", (Term("$Y"), sala_cultivos)),
+              Predicate("denuncia", (Term("$X"), Term("$Y"))),),
+    ))
     # === END YOUR CODE ===
 
     return kb
